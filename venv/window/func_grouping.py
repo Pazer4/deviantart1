@@ -1,13 +1,23 @@
 from tkinter import *
 from tkinter.ttk import Combobox
+from tkinter import messagebox
 import math
 
+# нужен для слежения на какой страницы находимся в программе
 flag = 0
-dict_group_album={}
 
+# определяет была ли найдена группировка в файле или нет(используется в функции func_select)
+flag_3 = 0
+
+# альбом,куда временно сохраняются все выборы по альбомам
+dict_group_album = {}
+
+
+# Сохраняет текущие воборы альбомов в словарь + записывает все из словаря в файл
 def save():
     global dict_group_album
 
+    # Проверяет какие группы "активны" и сохраняет выбранный альбом в словарь
     if label_1["state"] == "normal":
         dict_group_album[label_1["text"]] = combo_1.get()
     if label_2["state"] == "normal":
@@ -33,36 +43,45 @@ def save():
     if label_12["state"] == "normal":
         dict_group_album[label_12["text"]] = combo_12.get()
 
-
+    # флаг для проверки есть ли такая групировка в файле
     flag_save = 0
-    file_string=open("групировки_альбомов2.txt").readlines()
 
-    file=open("групировки_альбомов2.txt","w")
-    our_stroka = (select_group_label["text"] + "=>")
-    for i in dict_group_album.keys():
-        our_stroka += (i + "::" + dict_group_album[i] + "<>")
-    our_stroka+="\n"
+    # собирает строку из значений в словаре по принципу:
+    # [название группировки] => название группы::название альбома<>название группы::название альбома<>....
+    our_string = (select_group_label["text"] + "=>")
+    for key in dict_group_album.keys():
+        our_string += (key + "::" + dict_group_album[key] + "<>")
+    our_string += "\n"
 
+    # Проверяет,есть ли такое название альбома в файле.Если есть,переписывает эту строчку.Если нет,то записывает в конец.
+    file_string = open("групировки_альбомов2.txt").readlines()
+    file_write = open("групировки_альбомов2.txt", "w")
     for stroka in file_string:
         if stroka.split("=>")[0] == select_group_label["text"]:
-            file.writelines(our_stroka)
-            flag_save=1
+            file_write.writelines(our_string)
+            flag_save = 1
         else:
-            file.writelines(stroka)
+            file_write.writelines(stroka)
 
     if flag_save == 0:
-        file.writelines(our_stroka)
+        file_write.writelines(our_string)
 
+    file_write.close()
+
+
+# проверяет есть ли подстрока(название группировки) в массиве названий альбомов.Если нет,то возвращает СТРОКУ "None"
 def substring(substring, values):
-    for i in values:
-        if substring.lower() in i.lower():
-            return i
+    for album in values:
+        if substring.lower() in album.lower():
+            return album
     return "None"
 
 
+# Удаляет название группировки из окошка проги и файла с названиями группировок
 def delete():
     selection = languages_listbox.curselection()
 
+    # удаляет строку с названием из файла
     text_file = open("групировки_альбомов.txt").readlines()
     delete_file = open("групировки_альбомов.txt", "w")
     for line in text_file:
@@ -72,22 +91,32 @@ def delete():
             continue
     delete_file.close()
 
+    # удаляет строку из окошка программы
     languages_listbox.delete(selection[0])
 
 
-# добавление нового элемента
+# добавление нового названия группировки в окошко и в файл
 def add():
     new_language = language_entry.get()
+    # добавление в окно программы
     languages_listbox.insert(END, new_language)
+    # добавление в файл
     add_file = open("групировки_альбомов.txt", "a")
-    add_file.writelines(new_language+"\n")
+    add_file.writelines(new_language + "\n")
     add_file.close()
 
 
+# функция сохраняет в словарь текущие выбранные альбомы групп и "перелистывает" страницу с группами
 def func_next(index_flag):
+    # флаг следит за номером страницы
     global flag
     flag += index_flag
 
+    # сохраняем текущие выбранные альбомы групп в словарь
+    func_save_in_massiv()
+
+    # замена всех label и combo на значения с новой страницы
+    # Так же проверяет существует ли вообще группа с таким номером в массиве.Если не существует,то блокирует label и combo
     if (0 + flag * 12) < more_line:
         label_1.configure(state="normal")
         combo_1.configure(state="normal")
@@ -196,8 +225,13 @@ def func_next(index_flag):
         label_12.configure(state="disabled")
         combo_12.configure(state="disabled")
 
+    # выставляет значения в combo по текущей группировке
+    func_select(0)
+
+    # меняет номер страницы в проге
     label_index.configure(text=str(flag + 1) + "/" + str(math.ceil(more_line / 12)))
 
+    # проверяет должна ли быть активная кнопка next и back
     if (flag + 1) == (math.ceil(more_line / 12)):
         next_button.configure(state="disabled")
     else:
@@ -208,113 +242,176 @@ def func_next(index_flag):
     else:
         back_button.configure(state="normal")
 
-    func_select(0)
+
+# Если label не заблакирован,то добавления выбранное значения с его combo в словарь
+def func_save_in_massiv():
+    if label_1["state"] == "normal":
+        dict_group_album[label_1["text"]] = combo_1.get()
+    if label_2["state"] == "normal":
+        dict_group_album[label_2["text"]] = combo_2.get()
+    if label_3["state"] == "normal":
+        dict_group_album[label_3["text"]] = combo_3.get()
+    if label_4["state"] == "normal":
+        dict_group_album[label_4["text"]] = combo_4.get()
+    if label_5["state"] == "normal":
+        dict_group_album[label_5["text"]] = combo_5.get()
+    if label_6["state"] == "normal":
+        dict_group_album[label_6["text"]] = combo_6.get()
+    if label_7["state"] == "normal":
+        dict_group_album[label_7["text"]] = combo_7.get()
+    if label_8["state"] == "normal":
+        dict_group_album[label_8["text"]] = combo_8.get()
+    if label_9["state"] == "normal":
+        dict_group_album[label_9["text"]] = combo_9.get()
+    if label_10["state"] == "normal":
+        dict_group_album[label_10["text"]] = combo_10.get()
+    if label_11["state"] == "normal":
+        dict_group_album[label_11["text"]] = combo_11.get()
+    if label_12["state"] == "normal":
+        dict_group_album[label_12["text"]] = combo_12.get()
 
 
+# Функция обнуляет или заполняет значениями из файла словарь и выставляет нужные значения в combo
 def func_select(flag_2):
+    # flag_2 определяет была ли нажата кнопка "выбрать" и надо обрабатывать словарь или надо просто выбрать значения в combo.
     global dict_group_album
-    if flag_2==1:
-        dict_group_album={}
+    global flag_3
+
+    if flag_2 == 1:
+        dict_group_album = {}
+
         index_select_group = languages_listbox.curselection()
         next_button.configure(state="normal")
         select_group = languages_listbox.get(index_select_group)
         select_group_label.configure(text=select_group)
 
-    if flag_2==0:
-        if label_1["state"]=="normal":
-            dict_group_album[label_1["text"]]=combo_1.get()
-        if label_2["state"] == "normal":
-            dict_group_album[label_2["text"]] = combo_2.get()
-        if label_3["state"] == "normal":
-            dict_group_album[label_3["text"]] = combo_3.get()
-        if label_4["state"] == "normal":
-            dict_group_album[label_4["text"]] = combo_4.get()
-        if label_5["state"] == "normal":
-            dict_group_album[label_5["text"]] = combo_5.get()
-        if label_6["state"] == "normal":
-            dict_group_album[label_6["text"]] = combo_6.get()
-        if label_7["state"] == "normal":
-            dict_group_album[label_7["text"]] = combo_7.get()
-        if label_8["state"] == "normal":
-            dict_group_album[label_8["text"]] = combo_8.get()
-        if label_9["state"] == "normal":
-            dict_group_album[label_9["text"]] = combo_9.get()
-        if label_10["state"] == "normal":
-            dict_group_album[label_10["text"]] = combo_10.get()
-        if label_11["state"] == "normal":
-            dict_group_album[label_11["text"]] = combo_11.get()
-        if label_12["state"] == "normal":
-            dict_group_album[label_12["text"]] = combo_12.get()
+        # проверяет есть ли в файле такая группировка,если есть,то заполняет словарь значениями из файла
+        file_select = open("групировки_альбомов2.txt").readlines()
+        for i in file_select:
+            file_split1 = i.split("=>")
+            name = file_split1[0]
+            if name == select_group:
+                flag_3 = 1
+                file_split2 = file_split1[1].split("<>")
+                for j in file_split2[0:-1]:
+                    file_split3 = j.split("::")
+                    dict_group_album[file_split3[0]] = file_split3[1]
+
+    # берёт значения выбранной группы из select_group_label(сделано для безопасности)
+    if flag_2 == 0:
         select_group = select_group_label["text"]
 
-    using_string = substring(select_group, combo_1["values"])
+    # Проверяет была ли найдена строчка в файле(flag_3=1) и выставляет значение в combo.
+    # Если была найдена строчка в файле,то берёт значения из словаря.Если нет,то ищет по названию группировки.
+    if flag_3 == 0:
+        using_string = substring(select_group, combo_1["values"])
+    else:
+        using_string = dict_group_album[label_1["text"]]
     index = combo_1["values"].index(using_string)
     combo_1.current(index)
 
-    using_string = substring(select_group, combo_2["values"])
+    if flag_3 == 0:
+        using_string = substring(select_group, combo_2["values"])
+    else:
+        using_string = dict_group_album[label_2["text"]]
     index = combo_2["values"].index(using_string)
     combo_2.current(index)
 
-    using_string = substring(select_group, combo_3["values"])
+    if flag_3 == 0:
+        using_string = substring(select_group, combo_3["values"])
+    else:
+        using_string = dict_group_album[label_3["text"]]
     index = combo_3["values"].index(using_string)
     combo_3.current(index)
 
-    using_string = substring(select_group, combo_4["values"])
+    if flag_3 == 0:
+        using_string = substring(select_group, combo_4["values"])
+    else:
+        using_string = dict_group_album[label_4["text"]]
     index = combo_4["values"].index(using_string)
     combo_4.current(index)
 
-    using_string = substring(select_group, combo_5["values"])
+    if flag_3 == 0:
+        using_string = substring(select_group, combo_5["values"])
+    else:
+        using_string = dict_group_album[label_5["text"]]
     index = combo_5["values"].index(using_string)
     combo_5.current(index)
 
-    using_string = substring(select_group, combo_6["values"])
+    if flag_3 == 0:
+        using_string = substring(select_group, combo_6["values"])
+    else:
+        using_string = dict_group_album[label_6["text"]]
     index = combo_6["values"].index(using_string)
     combo_6.current(index)
 
-    using_string = substring(select_group, combo_7["values"])
+    if flag_3 == 0:
+        using_string = substring(select_group, combo_7["values"])
+    else:
+        using_string = dict_group_album[label_7["text"]]
     index = combo_7["values"].index(using_string)
     combo_7.current(index)
 
-    using_string = substring(select_group, combo_8["values"])
+    if flag_3 == 0:
+        using_string = substring(select_group, combo_8["values"])
+    else:
+        using_string = dict_group_album[label_8["text"]]
     index = combo_8["values"].index(using_string)
     combo_8.current(index)
 
-    using_string = substring(select_group, combo_9["values"])
+    if flag_3 == 0:
+        using_string = substring(select_group, combo_9["values"])
+    else:
+        using_string = dict_group_album[label_9["text"]]
     index = combo_9["values"].index(using_string)
     combo_9.current(index)
 
-    using_string = substring(select_group, combo_10["values"])
+    if flag_3 == 0:
+        using_string = substring(select_group, combo_10["values"])
+    else:
+        using_string = dict_group_album[label_10["text"]]
     index = combo_10["values"].index(using_string)
     combo_10.current(index)
 
-    using_string = substring(select_group, combo_11["values"])
+    if flag_3 == 0:
+        using_string = substring(select_group, combo_11["values"])
+    else:
+        using_string = dict_group_album[label_11["text"]]
     index = combo_11["values"].index(using_string)
     combo_11.current(index)
 
-    using_string = substring(select_group, combo_12["values"])
+    if flag_3 == 0:
+        using_string = substring(select_group, combo_12["values"])
+    else:
+        using_string = dict_group_album[label_12["text"]]
     index = combo_12["values"].index(using_string)
     combo_12.current(index)
 
 
-
-
-
+# создание основного окна
 new_window = Tk()
 new_window.geometry("700x220")
+new_window.resizable(False, False)
 new_window.title("GUI на Python")
+
+# создание пустых label для выравнивания ширины будущих combo и label
 label_empty1 = Label(new_window, width=15).grid(row=0, column=2)
 label_empty2 = Label(new_window, width=15).grid(row=0, column=3)
 label_empty3 = Label(new_window, width=15).grid(row=0, column=4)
 
+# место ввода названия группировки для добавления
 language_entry = Entry(width=30)
 language_entry.grid(column=0, row=0, padx=6, pady=6)
 
+# список группировок
 languages_listbox = Listbox(width=30, height=4)
 languages_listbox.grid(row=1, column=0)
 
-select_group_label=Label(new_window)
-select_group_label.grid(row=2,column=0)
+# строка,где пишется название выбранной группы
+select_group_label = Label(new_window)
+select_group_label.grid(row=2, column=0)
 
+# смотрит есть ли файл с группировками и добавлет группировки в список. Если файла нет,то создает его
 try:
     file = open("групировки_альбомов.txt").read().splitlines()
     for i in file:
@@ -323,30 +420,42 @@ except FileNotFoundError:
     file = open("групировки_альбомов.txt", "w+")
     file.close()
 
+# кнопка добавления новой группировки
 add_button = Button(text="Добавить", command=add).grid(column=1, row=0)
+# кнопка удаления группировки
 delete_button = Button(text="Удалить", command=delete).grid(row=1, column=1, sticky=S + W)
-save_button= Button(text="Сохранить",command=save).grid(row=2,column=1)
+# кнопка сохранения выбранных альбомов
+save_button = Button(text="Сохранить", command=save).grid(row=2, column=1)
+# кнопка выбора группировки
 select_button = Button(text="Выбрать", command=lambda: func_select(1)).grid(row=1, column=1, sticky=N)
 
+# проверяет файл "анализ_групп" и добавляет значения от туда в массивы name_group и name_album.
+# Если файла не существует,то вылезает окно с предупреждением и закрывется программа
+try:
+    file = open("анализ_груп.txt", "r").readlines()
+    name_group = []
+    name_album = []
+    more_line = len(file)
+    for line in file:
+        i = line.split("=>")
+        j = ["None"] + i[1].split("<>")
+        name_group += [i[0]]
+        name_album += [j]
+except FileNotFoundError:
+    messagebox.showinfo('Атятя', 'Не существует файла с анализом групп')
+    sys.exit()
 
-file = open("анализ_груп.txt", "r").readlines()
-name_group = []
-name_album = []
-more_line = len(file)
-for line in file:
-    i = line.split("=>")
-    j = ["None"] + i[1].split("<>")
-    name_group += [i[0]]
-    name_album += [j]
-
-
+# строка,показывающая номер "страницы"
 label_index = Label(new_window, text=str(flag + 1) + "/" + str(math.ceil(more_line / 12)))
 label_index.grid(row=6, column=4, sticky=W)
+
+# кнопки для перелистывания "страниц"
 back_button = Button(text="Back", state="disabled", command=lambda: func_next(-1))
 back_button.grid(row=6, column=4)
 next_button = Button(text="Next", state="disabled", command=lambda: func_next(1))
 next_button.grid(row=6, column=4, sticky=E)
 
+# создание label и combo для каждой группы
 label_1 = Label(new_window, text=name_group[0 + flag * 12])
 label_1.grid(row=0, column=2, sticky=W + E)
 combo_1 = Combobox(new_window, values=name_album[0 + flag * 12])
