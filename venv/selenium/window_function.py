@@ -1,6 +1,15 @@
 from selenium import webdriver
-from selenium_function import *
+from selenium_function import list_of_group,authentication,album_of_group,picture_in_album
+import os
 
+def read_login_password():
+    file = open("авторизация.txt", "r").read().splitlines()
+    for i in file:
+        if "login" in i:
+            login = i[6:]
+        else:
+            password = i[9:]
+    return login,password
 
 def func_login(login_entry, password_entry):
     # Получает данные логина и пароля
@@ -32,10 +41,7 @@ def func_album_group():
     browser = webdriver.Chrome()
 
     # Берутся даныне авторизации из папки и проивзодит авторизацию.
-    file = open("авторизация.txt", "r")
-    login = file.readline()[6:]
-    password = file.readline()[9:]
-    file.close()
+    login,password=read_login_password()
     authentication(browser, login, password)
 
     # Берутся URL сайтов из папки.
@@ -69,13 +75,40 @@ def func_album_group():
         file.write("\n")
     file.close()
 
-def func_picture_in_album(file_entry):
-    login = "lPazerl"
-    password = "A546456A"
+def func_picture_in_album(file_entry,grouping_combo):
+    login, password = read_login_password()
+
     name_picture = file_entry.get()
-    link = "https://www.deviantart.com/new-test876578"
-    name_album = "test"
+
+    grouping_name = grouping_combo.get()
+    dict_album = {}
+    new_dict = {}
+    file = open("групировки_альбомов2.txt").readlines()
+    for i in file:
+        file_split1 = i.split("=>")
+        if file_split1[0] == grouping_name:
+            file_split2 = file_split1[1].split("<>")
+            for j in file_split2[0:-1]:
+                file_split3 = j.split("::")
+                dict_album[file_split3[0]] = file_split3[1]
+
+    for i in dict_album.keys():
+        if dict_album[i] != "None":
+            file2 = open("Список_групп.txt").read().splitlines()
+            for j in file2:
+                split_group = j.split("::")
+                if split_group[0] == i:
+                    new_dict[dict_album[i]] = split_group[1]
+
     browser = webdriver.Chrome()
     authentication(browser, login, password)
-    picture_in_album(browser, link, name_album, name_picture)
+    for i in new_dict.keys():
+        name_album = i
+        link = new_dict[i]
+        picture_in_album(browser, link, name_album, name_picture)
+
     browser.quit()
+
+#запускает файл grouping.py
+def func_grouping():
+    os.system('python grouping.py')

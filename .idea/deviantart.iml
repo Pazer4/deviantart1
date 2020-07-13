@@ -8,6 +8,7 @@
       <sourceFolder url="file://$MODULE_DIR$/venv" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/venv/Scripts" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/venv/Lib" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/venv/window — копия" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

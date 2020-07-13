@@ -2,6 +2,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 import math
+import time
 
 
 # Принимает на вход ссылку на группу. Возвращает имя группы
@@ -75,7 +76,7 @@ def album_of_group(browser, dict_album, link):
         select_button.click()
         list_album = browser.find_elements_by_css_selector(".option")
     except:
-        dict_album[name_group(link)] = ["НАПИСАТЬ РУЧКАМИ:ONE_ALBUM"]
+        dict_album[name_group(link)] = ["write yourself:ONE_ALBUM"]
         return dict_album
 
     for album in list_album:
@@ -92,16 +93,19 @@ def album_of_group(browser, dict_album, link):
 # Загружает картинку в альбом выбранной группы.
 def picture_in_album(browser, link, name_album, name_picture):
     browser.get(link + "/gallery/")
+    triger_name="ONE_ALBUM"
 
     contribute_button = browser.find_element_by_css_selector("#gmi-GalleryEditor .gmbutton2")
     contribute_button.click()
-    select_button = WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".select_pager")))
-    select_button.click()
 
-    select = browser.find_element_by_xpath("//div[text()=\"" + name_album + "\"]")
-    select.click()
+    if triger_name not in name_album:
+        select_button = WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".select_pager")))
+        select_button.click()
+        select = browser.find_element_by_xpath("//div[text()=\"" + name_album + "\"]")
+        select.click()
 
-    picture = browser.find_element_by_css_selector("#modalspace [alt^=\"" + name_picture + "\"]")
+    print("#modalspace [alt^=\'" + name_picture + "\']")
+    picture=WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "#modalspace [alt^=\'" + name_picture + "\']")))
     picture.click()
 
     submit_button = browser.find_element_by_css_selector(".ok-label")
