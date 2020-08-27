@@ -40,17 +40,31 @@ password_entry=Entry(window, width=10)
 password_entry.place(x=56,y=29)
 password_entry.insert(0,password)
 
-Label(window, text="Загружаемый файл").place(x=520, y=105)
-file_entry=Entry(window, width=10)
-file_entry.place(x=640, y=105)
+Label(window, text="Загружаемый файл").place(x=520, y=80)
+file_entry=Entry(window, width=20)
+file_entry.place(x=640, y=80)
+
+Label(window, text="Номер страницы галереи").place(x=520, y=55)
+page_number=Combobox(window, value=["1","2","3","4","5"],width=3)
+page_number.current(0)
+page_number.place(x=670, y=55)
 
 grouping_values=[]
 grouping_file=open("групировки_альбомов2.txt").readlines()
 for i in grouping_file:
     grouping_values+=[i.split("=>")[0]]
-grouping_label=Label(window,text="Группировка").place(x=520,y=130)
+grouping_label=Label(window,text="Группировка").place(x=520,y=105)
 grouping_combo=Combobox(window,value=grouping_values)
-grouping_combo.place(x=600,y=130)
+grouping_combo.place(x=600,y=105)
+
+
+Label(window, text="Дозагружать после ").place(x=520,y=130)
+additional_load_groups=[]
+additional_load_file=open("Список_групп.txt").readlines()
+for i in additional_load_file:
+    additional_load_groups+=[i.split("::")[0]]
+additional_load_combo=Combobox(window,value=additional_load_groups)
+additional_load_combo.place(x=637,y=130)
 
 
 
@@ -69,8 +83,11 @@ btn1.place(x=70, y=150, height=300, width=150)
 btn2 = Button(window, text="Анализ альбомов групп", bg="pink", fg="brown", command=func_album_group)
 btn2.place(x=320, y=150, height=300, width=150)
 
-btn3 = Button(window, text="Загрузка в группы", bg="pink", fg="brown", command=lambda: func_picture_in_album(file_entry,grouping_combo))
-btn3.place(x=570, y=150, height=300, width=150)
+btn3 = Button(window, text="Загрузка в группы", bg="pink", fg="brown", command=lambda: func_picture_in_album(file_entry,grouping_combo,0,page_number))
+btn3.place(x=570, y=150, height=150, width=150)
+
+btn5 = Button(window, text="Дозагрузка в альбомы", bg="pink", fg="brown", command=lambda: func_picture_in_album(file_entry,grouping_combo,additional_load_combo,page_number))
+btn5.place(x=570, y=300, height=150, width=150)
 
 btn4 = Button(window, text="Составление групп из альбомов", bg="pink", fg="brown", command=func_grouping)
 btn4.place(x=300, y=50, height=50, width=200)

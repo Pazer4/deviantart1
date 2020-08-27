@@ -4,6 +4,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import math
 import time
 
+time_waiting=4
 
 # Принимает на вход ссылку на группу. Возвращает имя группы
 def name_group(link):
@@ -18,7 +19,7 @@ def name_group(link):
 def authentication(browser, login, password):
     link = "https://www.deviantart.com/users/login"
     browser.get(link)
-
+    browser.maximize_window()
     browser.find_element_by_css_selector("#username").send_keys(login)
     browser.find_element_by_css_selector("#password").send_keys(password)
     browser.find_element_by_css_selector("#loginbutton").click()
@@ -34,26 +35,27 @@ def digit_in_string(stroka):
 
 
 # Принимает браузер и flag(равен Group Member или Watching).Возращает словарь со списком групп(название группы:ссылка на группу)
-def list_of_group(browser,flag):
+def list_of_group(browser, flag):
     link = "https://www.deviantart.com/locelotkal/about"
     browser.get(link)
-
+    browser.maximize_window()
     if flag == "group":
-        stroka_selector="#group_list_members ._30hmv"
-        button_selector="#group_list_members .ucOYB._36ZWN._1SxyW"
-        group_selector="._3mZ8d.FnJV9"
+        stroka_selector = "#group_list_members ._30hmv"
+        button_selector = "#group_list_members .ucOYB._36ZWN._1SxyW"
+        group_selector = "._3mZ8d.FnJV9"
     elif flag == "watching":
-        stroka_selector="#watching ._30hmv"
-        button_selector="#watching .ucOYB._36ZWN._1SxyW"
-        group_selector="#watching .user-link._2diFW._2DrVR._1TzPv"
+        stroka_selector = "#watching ._30hmv"
+        button_selector = "#watching .ucOYB._36ZWN._1SxyW"
+        group_selector = "#watching .user-link._2diFW._2DrVR._1TzPv"
 
     stroka = browser.find_element_by_css_selector(stroka_selector).text
     value_group = digit_in_string(stroka)
     for i in range(math.ceil((value_group - 15) / 24)):
-        more_button = WebDriverWait(browser, 10).until(
+        more_button = WebDriverWait(browser, time_waiting).until(
             EC.element_to_be_clickable((By.CSS_SELECTOR, button_selector)))
         more_button.click()
 
+    time.sleep(3)
     group_list = browser.find_elements_by_css_selector(group_selector)
     group_dict = {}
 
@@ -72,7 +74,8 @@ def album_of_group(browser, dict_album, link):
     contribute_button = browser.find_element_by_css_selector("#gmi-GalleryEditor .gmbutton2")
     contribute_button.click()
     try:
-        select_button = WebDriverWait(browser, 3).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".select_pager")))
+        select_button = WebDriverWait(browser, time_waiting).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, ".select_pager")))
         select_button.click()
         list_album = browser.find_elements_by_css_selector(".option")
     except:
@@ -91,22 +94,35 @@ def album_of_group(browser, dict_album, link):
 
 # Принимает на вход браузер,ссылку на группу,имя альбома и название картинки.
 # Загружает картинку в альбом выбранной группы.
-def picture_in_album(browser, link, name_album, name_picture):
+def picture_in_album(browser, link, name_album, name_picture,page_number):
     browser.get(link + "/gallery/")
-    triger_name="ONE_ALBUM"
+    triger_name = "ONE_ALBUM"
 
     contribute_button = browser.find_element_by_css_selector("#gmi-GalleryEditor .gmbutton2")
     contribute_button.click()
 
     if triger_name not in name_album:
-        select_button = WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".select_pager")))
+        select_button = WebDriverWait(browser, time_waiting).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, ".select_pager")))
         select_button.click()
-        select = browser.find_element_by_xpath("//div[text()=\"" + name_album + "\"]")
+        select = WebDriverWait(browser, time_waiting).until(
+            EC.presence_of_element_located((By.XPATH, "//div[text()=\"" + name_album + "\"]")))
         select.click()
 
-    print("#modalspace [alt^=\'" + name_picture + "\']")
-    picture=WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "#modalspace [alt^=\'" + name_picture + "\']")))
+    for i in range(int(page_number)-1):
+        nextlink_button = WebDriverWait(browser, time_waiting).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, ".nextlink")))
+        nextlink_button.click()
+
+    picture = WebDriverWait(browser, time_waiting).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, "#modalspace [alt^=\'" + name_picture + "\']")))
     picture.click()
 
     submit_button = browser.find_element_by_css_selector(".ok-label")
     submit_button.click()
+    try:
+        error_message=WebDriverWait(browser,time_waiting).until(EC.presence_of_element_located((By.CSS_SELECTOR,"#modalspace .deepee-message-text")))
+        if error_message.text != "Your submission has been accepted!":
+            print(name_group(link) + ":" + name_album + error_message.text)
+    except:
+        1==1

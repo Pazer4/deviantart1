@@ -82,14 +82,25 @@ def delete():
     selection = languages_listbox.curselection()
 
     # удаляет строку с названием из файла
-    text_file = open("групировки_альбомов.txt").readlines()
+    text_file = open("групировки_альбомов.txt").read().splitlines()
     delete_file = open("групировки_альбомов.txt", "w")
     for line in text_file:
         if line != languages_listbox.get(selection[0]):
-            delete_file.writelines(line)
+            delete_file.writelines(line+"\n")
         else:
             continue
     delete_file.close()
+
+    text_file2 = open("групировки_альбомов2.txt").read().splitlines()
+    delete_file2 = open("групировки_альбомов2.txt", "w")
+
+    for line in text_file2:
+        split_line=line.split("=>")
+        if split_line[0] != languages_listbox.get(selection[0]):
+            delete_file2.writelines(line+"\n")
+        else:
+            continue
+    delete_file2.close()
 
     # удаляет строку из окошка программы
     languages_listbox.delete(selection[0])
@@ -284,6 +295,11 @@ def func_select(flag_2):
         next_button.configure(state="normal")
         select_group = languages_listbox.get(index_select_group)
         select_group_label.configure(text=select_group)
+        new_size=700
+        trtr=len(select_group)
+        if len(select_group) > 25:
+            new_size=700+5*(len(select_group) - 25)
+        new_window.geometry(f"{new_size}x220")
 
         # проверяет есть ли в файле такая группировка,если есть,то заполняет словарь значениями из файла
         file_select = open("групировки_альбомов2.txt").readlines()
@@ -303,87 +319,123 @@ def func_select(flag_2):
 
     # Проверяет была ли найдена строчка в файле(flag_3=1) и выставляет значение в combo.
     # Если была найдена строчка в файле,то берёт значения из словаря.Если нет,то ищет по названию группировки.
-    if flag_3 == 0:
-        using_string = substring(select_group, combo_1["values"])
+    if flag_3 != 0:
+        if label_1["text"] in dict_group_album.keys():
+            using_string = dict_group_album[label_1["text"]]
+        else:
+            using_string = "None"
     else:
-        using_string = dict_group_album[label_1["text"]]
+        using_string = substring(select_group, combo_1["values"])
     index = combo_1["values"].index(using_string)
     combo_1.current(index)
 
-    if flag_3 == 0:
-        using_string = substring(select_group, combo_2["values"])
+    if flag_3 != 0:
+        if label_2["text"] in dict_group_album.keys():
+            using_string = dict_group_album[label_2["text"]]
+        else:
+            using_string = "None"
     else:
-        using_string = dict_group_album[label_2["text"]]
+        using_string = substring(select_group, combo_2["values"])
     index = combo_2["values"].index(using_string)
     combo_2.current(index)
 
-    if flag_3 == 0:
-        using_string = substring(select_group, combo_3["values"])
+    if flag_3 != 0:
+        if label_3["text"] in dict_group_album.keys():
+            using_string = dict_group_album[label_3["text"]]
+        else:
+            using_string = "None"
     else:
-        using_string = dict_group_album[label_3["text"]]
+        using_string = substring(select_group, combo_3["values"])
     index = combo_3["values"].index(using_string)
     combo_3.current(index)
 
-    if flag_3 == 0:
-        using_string = substring(select_group, combo_4["values"])
+    if flag_3 != 0:
+        if label_4["text"] in dict_group_album.keys():
+            using_string = dict_group_album[label_4["text"]]
+        else:
+            using_string = "None"
     else:
-        using_string = dict_group_album[label_4["text"]]
+        using_string = substring(select_group, combo_4["values"])
     index = combo_4["values"].index(using_string)
     combo_4.current(index)
 
-    if flag_3 == 0:
-        using_string = substring(select_group, combo_5["values"])
+    if flag_3 != 0:
+        if label_5["text"] in dict_group_album.keys():
+            using_string = dict_group_album[label_5["text"]]
+        else:
+            using_string = "None"
     else:
-        using_string = dict_group_album[label_5["text"]]
+        using_string = substring(select_group, combo_5["values"])
     index = combo_5["values"].index(using_string)
     combo_5.current(index)
 
-    if flag_3 == 0:
-        using_string = substring(select_group, combo_6["values"])
+    if flag_3 != 0:
+        if label_6["text"] in dict_group_album.keys():
+            using_string = dict_group_album[label_6["text"]]
+        else:
+            using_string = "None"
     else:
-        using_string = dict_group_album[label_6["text"]]
+        using_string = substring(select_group, combo_6["values"])
     index = combo_6["values"].index(using_string)
     combo_6.current(index)
 
-    if flag_3 == 0:
-        using_string = substring(select_group, combo_7["values"])
+    if flag_3 != 0:
+        if label_7["text"] in dict_group_album.keys():
+            using_string = dict_group_album[label_7["text"]]
+        else:
+            using_string = "None"
     else:
-        using_string = dict_group_album[label_7["text"]]
+        using_string = substring(select_group, combo_7["values"])
     index = combo_7["values"].index(using_string)
     combo_7.current(index)
 
-    if flag_3 == 0:
-        using_string = substring(select_group, combo_8["values"])
+    if flag_3 != 0:
+        if label_8["text"] in dict_group_album.keys():
+            using_string = dict_group_album[label_8["text"]]
+        else:
+            using_string = "None"
     else:
-        using_string = dict_group_album[label_8["text"]]
+        using_string = substring(select_group, combo_8["values"])
     index = combo_8["values"].index(using_string)
     combo_8.current(index)
 
-    if flag_3 == 0:
-        using_string = substring(select_group, combo_9["values"])
+    if flag_3 != 0:
+        if label_9["text"] in dict_group_album.keys():
+            using_string = dict_group_album[label_9["text"]]
+        else:
+            using_string = "None"
     else:
-        using_string = dict_group_album[label_9["text"]]
+        using_string = substring(select_group, combo_9["values"])
     index = combo_9["values"].index(using_string)
     combo_9.current(index)
 
-    if flag_3 == 0:
-        using_string = substring(select_group, combo_10["values"])
+    if flag_3 != 0:
+        if label_10["text"] in dict_group_album.keys():
+            using_string = dict_group_album[label_10["text"]]
+        else:
+            using_string = "None"
     else:
-        using_string = dict_group_album[label_10["text"]]
+        using_string = substring(select_group, combo_10["values"])
     index = combo_10["values"].index(using_string)
     combo_10.current(index)
 
-    if flag_3 == 0:
-        using_string = substring(select_group, combo_11["values"])
+    if flag_3 != 0:
+        if label_11["text"] in dict_group_album.keys():
+            using_string = dict_group_album[label_11["text"]]
+        else:
+            using_string = "None"
     else:
-        using_string = dict_group_album[label_11["text"]]
+        using_string = substring(select_group, combo_11["values"])
     index = combo_11["values"].index(using_string)
     combo_11.current(index)
 
-    if flag_3 == 0:
-        using_string = substring(select_group, combo_12["values"])
+    if flag_3 != 0:
+        if label_12["text"] in dict_group_album.keys():
+            using_string = dict_group_album[label_12["text"]]
+        else:
+            using_string = "None"
     else:
-        using_string = dict_group_album[label_12["text"]]
+        using_string = substring(select_group, combo_12["values"])
     index = combo_12["values"].index(using_string)
     combo_12.current(index)
 
@@ -391,7 +443,7 @@ def func_select(flag_2):
 # создание основного окна
 new_window = Tk()
 new_window.geometry("700x220")
-new_window.resizable(False, False)
+#new_window.resizable(False, False)
 new_window.title("GUI на Python")
 
 # создание пустых label для выравнивания ширины будущих combo и label
@@ -425,7 +477,7 @@ add_button = Button(text="Добавить", command=add).grid(column=1, row=0)
 # кнопка удаления группировки
 delete_button = Button(text="Удалить", command=delete).grid(row=1, column=1, sticky=S + W)
 # кнопка сохранения выбранных альбомов
-save_button = Button(text="Сохранить", command=save).grid(row=2, column=1)
+save_button = Button(text="Сохранить", command=save).grid(row=3, column=1)
 # кнопка выбора группировки
 select_button = Button(text="Выбрать", command=lambda: func_select(1)).grid(row=1, column=1, sticky=N)
 
