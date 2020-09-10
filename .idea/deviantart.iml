@@ -19,7 +19,9 @@
       <sourceFolder url="file://$MODULE_DIR$/venv/Lib/site-packages/~ip-19.0.3-py3.8.egg" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/venv/Lib/site-packages/~-p-19.0.3-py3.8.egg" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/venv/Lib/site-packages/~~p-19.0.3-py3.8.egg" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/venv/window" />
       <excludeFolder url="file://$MODULE_DIR$/venv/window — копия" />
+      <excludePattern pattern="авторизация.txt" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.8 (projects)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
